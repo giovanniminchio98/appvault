@@ -389,6 +389,25 @@
     .app-grid { grid-template-columns: 1fr; }
     .stat-divider { display: none; }
   }
+  /* ── SKELETON ── */
+  .skeleton { pointer-events: none; cursor: default; }
+  .skeleton-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(90deg,#2a2a2a,#333,#2a2a2a);
+    background-size: 200%;
+    animation: shimmer 1.3s infinite;
+  }
+  .skeleton-line {
+    height: 12px; border-radius: 6px;
+    background: linear-gradient(90deg,#2a2a2a,#333,#2a2a2a);
+    background-size: 200%;
+    animation: shimmer 1.3s infinite;
+  }
+  @keyframes shimmer {
+    from { background-position: 200% center; }
+    to   { background-position: -200% center; }
+  }
+
   /* ── SOCIAL BAR ── */
   .social-bar {
     display: flex;
@@ -413,7 +432,6 @@
 
   .social-link:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,240,96,0.06); }
   .social-link svg { width: 16px; height: 16px; fill: currentColor; }
-
 </style>
 </head>
 <body>
@@ -429,7 +447,7 @@
   <!-- STATS -->
   <div class="stats-bar">
     <div class="stat-item">
-      <span class="val" id="live-count">8</span>
+      <span class="val" id="live-count">—</span>
       <span class="lbl">Live Apps</span>
     </div>
     <div class="stat-divider"></div>
@@ -488,134 +506,159 @@
 </footer>
 
 <script>
-const apps = [
-  {
+// ─────────────────────────────────────────────────────────────
+// CONFIG — add/edit entries here when you publish a new app.
+// Repos NOT listed here will auto-appear with defaults.
+// Set hidden:true to suppress a repo entirely.
+// ─────────────────────────────────────────────────────────────
+const APP_CONFIG = {
+  "gridlock-tic-tac-toe": {
     name: "GridLock",
-    tagline: "Classic Tic-Tac-Toe reinvented with three AI difficulty levels — from casual to unbeatable minimax.",
+    tagline: "Classic Tic-Tac-Toe with three AI difficulty levels — from casual to unbeatable minimax.",
     tags: ["minimax AI", "2-player", "stats"],
-    category: "Games",
-    filter: "games",
-    icon: "⚔️",
-    url: "https://giovanniminchio98.github.io/gridlock-tic-tac-toe/",
-    status: "live",
-    accentColor: "#60c8f0",
-    glowColor: "rgba(96,200,240,0.06)",
-    iconBg: "rgba(96,200,240,0.1)",
-    iconBorder: "rgba(96,200,240,0.2)"
+    category: "Games", filter: "games", icon: "⚔️",
+    accentColor: "#60c8f0", glowColor: "rgba(96,200,240,0.06)",
+    iconBg: "rgba(96,200,240,0.1)", iconBorder: "rgba(96,200,240,0.2)"
   },
-  {
+  "bmi-body-calculator": {
     name: "BMI & TDEE",
     tagline: "Body composition calculator — BMI, daily calorie needs, macro targets and goal weight estimator.",
     tags: ["Mifflin-St Jeor", "macros", "goals"],
-    category: "Health",
-    filter: "health",
-    icon: "🏃",
-    url: "https://giovanniminchio98.github.io/bmi-body-calculator/",
-    status: "live",
-    accentColor: "#c8f060",
-    glowColor: "rgba(200,240,96,0.05)",
-    iconBg: "rgba(200,240,96,0.1)",
-    iconBorder: "rgba(200,240,96,0.2)"
+    category: "Health", filter: "health", icon: "🏃",
+    accentColor: "#c8f060", glowColor: "rgba(200,240,96,0.05)",
+    iconBg: "rgba(200,240,96,0.1)", iconBorder: "rgba(200,240,96,0.2)"
   },
-  {
+  "skycast-weather-app": {
     name: "SkyCast",
-    tagline: "Live weather forecasts powered by Open-Meteo with best-match regional model precision and city search.",
+    tagline: "Live weather forecasts powered by Open-Meteo with best-match regional model and city search.",
     tags: ["Open-Meteo", "autocomplete", "7-day"],
-    category: "Tools",
-    filter: "tools",
-    icon: "🌤",
-    url: "https://giovanniminchio98.github.io/skycast-weather-app/",
-    status: "live",
-    accentColor: "#60c8f0",
-    glowColor: "rgba(96,200,240,0.06)",
-    iconBg: "rgba(96,200,240,0.1)",
-    iconBorder: "rgba(96,200,240,0.2)"
+    category: "Tools", filter: "tools", icon: "🌤",
+    accentColor: "#60c8f0", glowColor: "rgba(96,200,240,0.06)",
+    iconBg: "rgba(96,200,240,0.1)", iconBorder: "rgba(96,200,240,0.2)"
   },
-  {
+  "flow-split-budget-allocator": {
     name: "FlowSplit",
     tagline: "Smart budget planner using the 50/30/20 framework with custom sliders and 30-year investment simulation.",
     tags: ["50/30/20", "compound growth", "chart"],
-    category: "Finance",
-    filter: "finance",
-    icon: "💰",
-    url: "https://giovanniminchio98.github.io/flow-split-budget-allocator/",
-    status: "live",
-    accentColor: "#f0b860",
-    glowColor: "rgba(240,184,96,0.06)",
-    iconBg: "rgba(240,184,96,0.1)",
-    iconBorder: "rgba(240,184,96,0.2)"
+    category: "Finance", filter: "finance", icon: "💰",
+    accentColor: "#f0b860", glowColor: "rgba(240,184,96,0.06)",
+    iconBg: "rgba(240,184,96,0.1)", iconBorder: "rgba(240,184,96,0.2)"
   },
-  {
+  "net-salary-calculator": {
     name: "NetSalary",
     tagline: "Gross-to-net salary calculator for Italy, Belgium, Luxembourg, Finland and Switzerland with editable tax brackets.",
     tags: ["multi-country", "tax brackets", "IT · BE · LU"],
-    category: "Finance",
-    filter: "finance",
-    icon: "🧾",
-    url: "https://giovanniminchio98.github.io/net-salary-calculator/",
-    status: "live",
-    accentColor: "#f0b860",
-    glowColor: "rgba(240,184,96,0.06)",
-    iconBg: "rgba(240,184,96,0.1)",
-    iconBorder: "rgba(240,184,96,0.2)"
+    category: "Finance", filter: "finance", icon: "🧾",
+    accentColor: "#f0b860", glowColor: "rgba(240,184,96,0.06)",
+    iconBg: "rgba(240,184,96,0.1)", iconBorder: "rgba(240,184,96,0.2)"
   },
-  {
+  "spendlog": {
     name: "SpendLog",
-    tagline: "Daily expense tracker with category tags, calendar view and monthly breakdowns. Data stays on your device.",
+    tagline: "Daily expense tracker with category tags, calendar view and monthly breakdowns. Stays on your device.",
     tags: ["local storage", "categories", "calendar"],
-    category: "Finance",
-    filter: "finance",
-    icon: "📒",
-    url: "https://giovanniminchio98.github.io/spendlog/",
-    status: "live",
-    accentColor: "#f0b860",
-    glowColor: "rgba(240,184,96,0.06)",
-    iconBg: "rgba(240,184,96,0.1)",
-    iconBorder: "rgba(240,184,96,0.2)"
+    category: "Finance", filter: "finance", icon: "📒",
+    accentColor: "#f0b860", glowColor: "rgba(240,184,96,0.06)",
+    iconBg: "rgba(240,184,96,0.1)", iconBorder: "rgba(240,184,96,0.2)"
   },
-  {
+  "wealthlens": {
     name: "WealthLens",
     tagline: "Month-by-month net worth tracker across cash, investments, crypto and more. Visualise your growth over time.",
     tags: ["net worth", "timeline", "chart"],
-    category: "Finance",
-    filter: "finance",
-    icon: "📈",
-    url: "https://giovanniminchio98.github.io/wealthlens/",
-    status: "live",
-    accentColor: "#c8f060",
-    glowColor: "rgba(200,240,96,0.05)",
-    iconBg: "rgba(200,240,96,0.1)",
-    iconBorder: "rgba(200,240,96,0.2)"
+    category: "Finance", filter: "finance", icon: "📈",
+    accentColor: "#c8f060", glowColor: "rgba(200,240,96,0.05)",
+    iconBg: "rgba(200,240,96,0.1)", iconBorder: "rgba(200,240,96,0.2)"
   },
-  {
+  "compoundcalculator.github.io": {
     name: "CompoundCalc",
     tagline: "Compound interest calculator with growth charts and yearly breakdowns to plan long-term savings goals.",
     tags: ["compound interest", "chart", "savings"],
-    category: "Finance",
-    filter: "finance",
-    icon: "🔢",
-    url: "https://giovanniminchio98.github.io/compoundcalculator.github.io/",
-    status: "live",
-    accentColor: "#f0b860",
-    glowColor: "rgba(240,184,96,0.06)",
-    iconBg: "rgba(240,184,96,0.1)",
-    iconBorder: "rgba(240,184,96,0.2)"
+    category: "Finance", filter: "finance", icon: "🔢",
+    accentColor: "#f0b860", glowColor: "rgba(240,184,96,0.06)",
+    iconBg: "rgba(240,184,96,0.1)", iconBorder: "rgba(240,184,96,0.2)"
+  },
+  // Repos to always hide (non-app repos)
+  "giovanniminchio98.github.io": { hidden: true }
+};
+
+// Default styling for unconfigured repos
+function defaultConfig(repoName) {
+  const accents = [
+    { accentColor:"#c8f060", glowColor:"rgba(200,240,96,0.05)", iconBg:"rgba(200,240,96,0.1)", iconBorder:"rgba(200,240,96,0.2)" },
+    { accentColor:"#f0b860", glowColor:"rgba(240,184,96,0.06)", iconBg:"rgba(240,184,96,0.1)", iconBorder:"rgba(240,184,96,0.2)" },
+    { accentColor:"#60c8f0", glowColor:"rgba(96,200,240,0.06)", iconBg:"rgba(96,200,240,0.1)", iconBorder:"rgba(96,200,240,0.2)" },
+  ];
+  const pick = accents[repoName.length % 3];
+  return {
+    name: repoName.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()),
+    tagline: "A standalone web tool — click to open.",
+    tags: ["web app"],
+    category: "Tools", filter: "tools", icon: "🛠",
+    ...pick
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+// GITHUB API FETCH
+// ─────────────────────────────────────────────────────────────
+const GITHUB_USER = "giovanniminchio98";
+const FILTER_CATEGORIES = ["all","finance","health","tools","games"];
+let allApps = [];
+let currentFilter = "all";
+
+async function fetchApps() {
+  showSkeleton();
+  try {
+    // Fetch all repos (up to 100; add &page=2 if you ever exceed that)
+    const res = await fetch(
+      `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=pushed`,
+      { headers: { Accept: "application/vnd.github+json" } }
+    );
+    if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+    const repos = await res.json();
+
+    allApps = repos
+      .filter(r => {
+        const cfg = APP_CONFIG[r.name];
+        if (cfg?.hidden) return false;           // explicitly hidden
+        return r.has_pages;                       // only published Pages repos
+      })
+      .map(r => {
+        const cfg = APP_CONFIG[r.name] || defaultConfig(r.name);
+        // Derive GH Pages URL
+        const url = r.homepage && r.homepage.startsWith("http")
+          ? r.homepage
+          : `https://${GITHUB_USER}.github.io/${r.name}/`;
+        return { ...cfg, url, repoName: r.name, pushedAt: r.pushed_at };
+      });
+
+    updateCount(allApps.length);
+    renderCards(currentFilter);
+  } catch (err) {
+    showError(err.message);
   }
-];
+}
 
+// ─────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────
 function renderCards(filter) {
+  currentFilter = filter;
   const grid = document.getElementById('app-grid');
-  const filtered = filter === 'all' ? apps : apps.filter(a => a.filter === filter);
+  const list = filter === 'all' ? allApps : allApps.filter(a => a.filter === filter);
 
-  grid.innerHTML = filtered.map((app, i) => {
-    const delay = 0.05 + i * 0.06;
-    const isLive = app.status === 'live';
+  if (!list.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:40px 0;">No apps in this category yet.</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map((app, i) => {
+    const delay = 0.04 + i * 0.05;
     return `
-    <a href="${app.url}" target="_blank" rel="noopener" class="app-card${isLive ? '' : ' coming-soon'}"
+    <a href="${app.url}" target="_blank" rel="noopener" class="app-card"
        style="--accent-color:${app.accentColor};--glow-color:${app.glowColor};--icon-bg:${app.iconBg};--icon-border:${app.iconBorder};animation-delay:${delay}s">
       <div class="card-top">
         <div class="app-icon">${app.icon}</div>
-        <span class="app-badge ${isLive ? 'badge-live' : 'badge-soon'}">${isLive ? '● Live' : '⏳ Soon'}</span>
+        <span class="app-badge badge-live">● Live</span>
       </div>
       <div class="app-name">${app.name}</div>
       <div class="app-tagline">${app.tagline}</div>
@@ -630,7 +673,32 @@ function renderCards(filter) {
   }).join('');
 }
 
-// Filter logic
+function showSkeleton() {
+  const grid = document.getElementById('app-grid');
+  grid.innerHTML = Array.from({length:6}).map((_,i) => `
+    <div class="app-card skeleton" style="animation-delay:${i*0.07}s">
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-line" style="width:55%;margin-top:12px;height:16px;"></div>
+      <div class="skeleton-line" style="width:90%;margin-top:8px;"></div>
+      <div class="skeleton-line" style="width:75%;margin-top:6px;"></div>
+      <div class="skeleton-line" style="width:40%;margin-top:16px;height:10px;"></div>
+    </div>`).join('');
+}
+
+function showError(msg) {
+  document.getElementById('app-grid').innerHTML = `
+    <div style="grid-column:1/-1;text-align:center;padding:40px 0;">
+      <div style="color:var(--bear);font-size:12px;margin-bottom:8px;">⚠ Could not load apps from GitHub</div>
+      <div style="color:var(--muted);font-size:11px;">${msg}</div>
+      <button onclick="fetchApps()" style="margin-top:16px;background:var(--card);border:1px solid var(--border);color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;padding:8px 18px;border-radius:8px;cursor:pointer;">Retry</button>
+    </div>`;
+}
+
+function updateCount(n) {
+  document.getElementById('live-count').textContent = n;
+}
+
+// Filter buttons
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -639,7 +707,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-renderCards('all');
+fetchApps();
 </script>
 </body>
 </html>
