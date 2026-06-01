@@ -192,7 +192,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 24px;
+    padding: 16px 18px;
     text-decoration: none;
     color: inherit;
     display: flex;
@@ -238,16 +238,16 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   .app-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
+    width: 36px; height: 36px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 17px;
     background: var(--icon-bg, rgba(200,240,96,0.1));
     border: 1px solid var(--icon-border, rgba(200,240,96,0.2));
     flex-shrink: 0;
@@ -269,25 +269,25 @@
   .app-name {
     font-family: 'DM Serif Display', serif;
     font-style: italic;
-    font-size: 22px;
+    font-size: 18px;
     line-height: 1.1;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     color: var(--text);
   }
 
   .app-tagline {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 20px;
+    line-height: 1.55;
+    margin-bottom: 12px;
     flex: 1;
   }
 
   .app-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 20px;
+    gap: 5px;
+    margin-bottom: 12px;
   }
 
   .tag {
@@ -304,7 +304,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 16px;
+    padding-top: 10px;
     border-top: 1px solid var(--border);
   }
 
@@ -389,6 +389,31 @@
     .app-grid { grid-template-columns: 1fr; }
     .stat-divider { display: none; }
   }
+  /* ── SOCIAL BAR ── */
+  .social-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .social-link:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,240,96,0.06); }
+  .social-link svg { width: 16px; height: 16px; fill: currentColor; }
+
 </style>
 </head>
 <body>
@@ -404,7 +429,7 @@
   <!-- STATS -->
   <div class="stats-bar">
     <div class="stat-item">
-      <span class="val" id="live-count">5</span>
+      <span class="val" id="live-count">8</span>
       <span class="lbl">Live Apps</span>
     </div>
     <div class="stat-divider"></div>
@@ -445,7 +470,21 @@
 
 <!-- FOOTER -->
 <footer>
-  AppVault &nbsp;·&nbsp; Built by Giovanni &nbsp;·&nbsp; All tools are standalone static apps, provided for personal use. No data is collected or stored. Results are for informational purposes only and do not constitute professional advice.
+  <div class="social-bar">
+    <!-- LinkedIn -->
+    <a class="social-link" href="https://www.linkedin.com/in/giovanni-minchio/" target="_blank" rel="noopener" title="LinkedIn">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+    <!-- X / Twitter -->
+    <a class="social-link" href="https://x.com/giovanniminchio" target="_blank" rel="noopener" title="X">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.631 5.905-5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </a>
+    <!-- Gmail -->
+    <a class="social-link" href="mailto:giovanni.minchio98@gmail.com" title="Email">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
+    </a>
+  </div>
+  <div style="margin-top:16px;">AppVault &nbsp;·&nbsp; Built by Giovanni &nbsp;·&nbsp; All tools are standalone static apps for personal use. No data collected or stored. Not professional advice.</div>
 </footer>
 
 <script>
@@ -514,6 +553,48 @@ const apps = [
     filter: "finance",
     icon: "🧾",
     url: "https://giovanniminchio98.github.io/net-salary-calculator/",
+    status: "live",
+    accentColor: "#f0b860",
+    glowColor: "rgba(240,184,96,0.06)",
+    iconBg: "rgba(240,184,96,0.1)",
+    iconBorder: "rgba(240,184,96,0.2)"
+  },
+  {
+    name: "SpendLog",
+    tagline: "Daily expense tracker with category tags, calendar view and monthly breakdowns. Data stays on your device.",
+    tags: ["local storage", "categories", "calendar"],
+    category: "Finance",
+    filter: "finance",
+    icon: "📒",
+    url: "https://giovanniminchio98.github.io/spendlog/",
+    status: "live",
+    accentColor: "#f0b860",
+    glowColor: "rgba(240,184,96,0.06)",
+    iconBg: "rgba(240,184,96,0.1)",
+    iconBorder: "rgba(240,184,96,0.2)"
+  },
+  {
+    name: "WealthLens",
+    tagline: "Month-by-month net worth tracker across cash, investments, crypto and more. Visualise your growth over time.",
+    tags: ["net worth", "timeline", "chart"],
+    category: "Finance",
+    filter: "finance",
+    icon: "📈",
+    url: "https://giovanniminchio98.github.io/wealthlens/",
+    status: "live",
+    accentColor: "#c8f060",
+    glowColor: "rgba(200,240,96,0.05)",
+    iconBg: "rgba(200,240,96,0.1)",
+    iconBorder: "rgba(200,240,96,0.2)"
+  },
+  {
+    name: "CompoundCalc",
+    tagline: "Compound interest calculator with growth charts and yearly breakdowns to plan long-term savings goals.",
+    tags: ["compound interest", "chart", "savings"],
+    category: "Finance",
+    filter: "finance",
+    icon: "🔢",
+    url: "https://giovanniminchio98.github.io/compoundcalculator.github.io/",
     status: "live",
     accentColor: "#f0b860",
     glowColor: "rgba(240,184,96,0.06)",
