@@ -389,7 +389,104 @@
     .app-grid { grid-template-columns: 1fr; }
     .stat-divider { display: none; }
   }
-  /* ── SKELETON ── */
+  /* ── CUSTOM CARD: ZIBALDONE (deep space, terminal, grid motif) ── */
+  .app-card.card-zibaldone {
+    background: #000008;
+    border-color: #1a1a2e;
+    --accent-color: #7b61ff;
+    --icon-bg: rgba(123,97,255,0.12);
+    --icon-border: rgba(123,97,255,0.25);
+  }
+  .app-card.card-zibaldone::before { background: #7b61ff; }
+  .app-card.card-zibaldone:hover { border-color: #7b61ff; box-shadow: 0 12px 40px rgba(123,97,255,0.2); }
+  .app-card.card-zibaldone .app-name { color: #e8e8ff; }
+  .app-card.card-zibaldone .card-category { color: #7b61ff; }
+  .app-card.card-zibaldone .app-tagline { color: #666688; }
+  .app-card.card-zibaldone .tag {
+    border-color: rgba(123,97,255,0.25);
+    color: #7b61ff;
+    background: rgba(123,97,255,0.07);
+  }
+  .app-card.card-zibaldone .card-footer { border-color: #1a1a2e; }
+  .app-card.card-zibaldone:hover .launch-arrow { color: #7b61ff; }
+  /* subtle grid overlay */
+  .app-card.card-zibaldone .card-bg-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    background-image:
+      linear-gradient(#7b61ff 1px, transparent 1px),
+      linear-gradient(90deg, #7b61ff 1px, transparent 1px);
+    background-size: 20px 20px;
+    border-radius: var(--radius);
+  }
+  .zib-live-badge {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 1px solid rgba(123,97,255,0.4);
+    color: #7b61ff;
+    background: rgba(123,97,255,0.08);
+    white-space: nowrap;
+  }
+
+  /* ── CUSTOM CARD: ANNUM (cosmic, warm amber/gold, starfield) ── */
+  .app-card.card-annum {
+    background: #0a0608;
+    border-color: #2a1f14;
+    --accent-color: #d4a843;
+    --icon-bg: rgba(212,168,67,0.1);
+    --icon-border: rgba(212,168,67,0.2);
+  }
+  .app-card.card-annum::before { background: linear-gradient(90deg, #d4a843, #c87941); }
+  .app-card.card-annum:hover { border-color: #d4a843; box-shadow: 0 12px 40px rgba(212,168,67,0.15); }
+  .app-card.card-annum .app-name {
+    font-size: 20px;
+    letter-spacing: 0.05em;
+    color: #f0d890;
+  }
+  .app-card.card-annum .card-category { color: #d4a843; }
+  .app-card.card-annum .app-tagline { color: #7a6040; }
+  .app-card.card-annum .tag {
+    border-color: rgba(212,168,67,0.25);
+    color: #d4a843;
+    background: rgba(212,168,67,0.07);
+  }
+  .app-card.card-annum .card-footer { border-color: #2a1f14; }
+  .app-card.card-annum:hover .launch-arrow { color: #d4a843; }
+  /* star dots */
+  .app-card.card-annum .card-stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .app-card.card-annum .card-stars::before {
+    content: '· · ✦ · · · ✧ · · ✦ · ·';
+    position: absolute;
+    top: 8px; right: 10px;
+    font-size: 8px;
+    color: rgba(212,168,67,0.25);
+    letter-spacing: 3px;
+    white-space: nowrap;
+  }
+  .annum-live-badge {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 1px solid rgba(212,168,67,0.35);
+    color: #d4a843;
+    background: rgba(212,168,67,0.08);
+    white-space: nowrap;
+  }
+
+</style>
   .skeleton { pointer-events: none; cursor: default; }
   .skeleton-icon {
     width: 36px; height: 36px; border-radius: 10px;
@@ -578,7 +675,25 @@ const APP_CONFIG = {
   },
   // Repos to always hide (non-app repos)
   "giovanniminchio98.github.io": { hidden: true },
-  "appvault": { hidden: true }
+  "appvault": { hidden: true },
+  "Claude-Agentic-Freedom": {
+    name: "Zibaldone.AI",
+    tagline: "Open knowledge base for agentic AI — learning paths, concept cards, tools, papers and a live news feed.",
+    tags: ["agentic AI", "LLMs", "knowledge base"],
+    category: "AI", filter: "tools", icon: "⬡",
+    accentColor: "#7b61ff", glowColor: "rgba(123,97,255,0.08)",
+    iconBg: "rgba(123,97,255,0.12)", iconBorder: "rgba(123,97,255,0.25)",
+    customCard: "zibaldone"
+  },
+  "Annum": {
+    name: "Annum",
+    tagline: "A chronicle of history — travel through 85 cosmic and human events from the Big Bang to today.",
+    tags: ["history", "timeline", "interactive"],
+    category: "Education", filter: "tools", icon: "✦",
+    accentColor: "#d4a843", glowColor: "rgba(212,168,67,0.06)",
+    iconBg: "rgba(212,168,67,0.1)", iconBorder: "rgba(212,168,67,0.2)",
+    customCard: "annum"
+  }
 };
 
 // Default styling for unconfigured repos
@@ -654,12 +769,25 @@ function renderCards(filter) {
 
   grid.innerHTML = list.map((app, i) => {
     const delay = 0.04 + i * 0.05;
+    const customClass = app.customCard ? ` card-${app.customCard}` : '';
+
+    // Custom badge per card type
+    let badge = `<span class="app-badge badge-live">● Live</span>`;
+    if (app.customCard === 'zibaldone') badge = `<span class="zib-live-badge">◈ Live</span>`;
+    if (app.customCard === 'annum')     badge = `<span class="annum-live-badge">✦ Live</span>`;
+
+    // Decorative bg elements
+    let decoration = '';
+    if (app.customCard === 'zibaldone') decoration = `<div class="card-bg-grid"></div>`;
+    if (app.customCard === 'annum')     decoration = `<div class="card-stars"></div>`;
+
     return `
-    <a href="${app.url}" target="_blank" rel="noopener" class="app-card"
+    <a href="${app.url}" target="_blank" rel="noopener" class="app-card${customClass}"
        style="--accent-color:${app.accentColor};--glow-color:${app.glowColor};--icon-bg:${app.iconBg};--icon-border:${app.iconBorder};animation-delay:${delay}s">
+      ${decoration}
       <div class="card-top">
         <div class="app-icon">${app.icon}</div>
-        <span class="app-badge badge-live">● Live</span>
+        ${badge}
       </div>
       <div class="app-name">${app.name}</div>
       <div class="app-tagline">${app.tagline}</div>
