@@ -1,6 +1,7 @@
 # appvault
 
 Application name: AppVault
+
 Version: 1.2
 
 **Details**: 
