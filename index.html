@@ -212,8 +212,13 @@
   }
   .app-card:hover .card-motif { opacity: 0.22; }
   .card-motif svg { width: 100%; height: 100%; display: block; }
-  /* finance motif uses candles drawn via the existing .card-candles when custom;
-     for the generic finance cards we use an upward trend line svg */
+
+  .cat-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+    opacity: 0.6;
+  }
 
   /* ── FILTER TABS ── */
   .filter-bar {
@@ -1040,8 +1045,14 @@ async function fetchApps() {
     if (!res.ok) throw new Error(`GitHub API ${res.status}`);
     const repos = await res.json();
 
+    // Case-insensitive config lookup so repo-name casing never matters
+    // (e.g. API "SpendLog" still matches config key "spendlog").
+    const CONFIG_LC = {};
+    for (const k in APP_CONFIG) CONFIG_LC[k.toLowerCase()] = APP_CONFIG[k];
+    const getCfg = name => APP_CONFIG[name] || CONFIG_LC[(name||"").toLowerCase()];
+
     const pageRepos = repos.filter(r => {
-      const cfg = APP_CONFIG[r.name];
+      const cfg = getCfg(r.name);
       if (cfg?.hidden) return false;
       return r.has_pages;
     });
@@ -1053,7 +1064,7 @@ async function fetchApps() {
         ? r.homepage
         : `https://${GITHUB_USER}.github.io/${r.name}/`;
 
-      const override = APP_CONFIG[r.name];   // optional manual override
+      const override = getCfg(r.name);   // optional manual override
       let meta = null;
       try { meta = await fetchMeta(url); } catch (e) { meta = null; }
 
@@ -1190,8 +1201,20 @@ function renderCards(filter) {
   }
 
   if (filter === 'all') {
-    // Grouped view: section header + grid per category
     container.className = 'app-groups';
+
+    // 1) Full alphabetical list of ALL apps
+    const allCards = list.map((a,i) => buildCard(a,i)).join('');
+    const allSection = `
+      <div class="cat-group">
+        <div class="cat-header" style="--cat-accent:var(--accent)">
+          <span class="cat-dot"></span>All Apps
+          <span class="cat-count">${list.length}</span>
+        </div>
+        <div class="app-grid">${allCards}</div>
+      </div>`;
+
+    // 2) Then the same apps split by category
     const groups = CATEGORY_ORDER
       .map(catKey => {
         const t = CATEGORY_THEMES[catKey];
@@ -1208,7 +1231,8 @@ function renderCards(filter) {
           </div>`;
       })
       .join('');
-    container.innerHTML = groups;
+
+    container.innerHTML = allSection + `<div class="cat-divider"></div>` + groups;
   } else {
     // Flat grid for a single category
     container.className = 'app-grid';
