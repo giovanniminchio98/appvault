@@ -149,6 +149,72 @@
     background: var(--border);
   }
 
+  /* ── FAVOURITES BAR ── */
+  .fav-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 22px;
+    animation: fadeUp 0.5s ease 0.12s both;
+  }
+  .fav-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-right: 2px;
+  }
+  .fav-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 8px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .fav-chip:hover {
+    border-color: var(--accent-color, var(--accent));
+    background: rgba(255,255,255,0.02);
+    transform: translateY(-2px);
+  }
+  .fav-chip .fav-icon { font-size: 14px; color: var(--accent-color, var(--accent)); }
+  .fav-chip .fav-arrow { font-size: 11px; color: var(--muted); transition: color 0.2s, transform 0.2s; }
+  .fav-chip:hover .fav-arrow { color: var(--accent-color, var(--accent)); transform: translate(2px,-2px); }
+
+  /* ── PER-CATEGORY CARD STYLES ── */
+  /* Each category gets a subtle background tint + signature motif.
+     The 3 bespoke cards (zibaldone/annum/cryptoscope) override these. */
+
+  .app-card.cat-finance     { background: linear-gradient(160deg, #1c1a14 0%, var(--card) 55%); }
+  .app-card.cat-health      { background: linear-gradient(160deg, #181c14 0%, var(--card) 55%); }
+  .app-card.cat-productivity{ background: linear-gradient(160deg, #14191c 0%, var(--card) 55%); }
+  .app-card.cat-ai          { background: linear-gradient(160deg, #17141c 0%, var(--card) 55%); }
+  .app-card.cat-education   { background: linear-gradient(160deg, #1c1914 0%, var(--card) 55%); }
+  .app-card.cat-tools       { background: linear-gradient(160deg, #1a1a1a 0%, var(--card) 55%); }
+  .app-card.cat-games       { background: linear-gradient(160deg, #1c1414 0%, var(--card) 55%); }
+
+  /* Decorative motif layer, low opacity, bottom-right */
+  .card-motif {
+    position: absolute;
+    bottom: -6px; right: -6px;
+    width: 70px; height: 70px;
+    pointer-events: none;
+    opacity: 0.10;
+    color: var(--accent-color, var(--accent));
+    transition: opacity 0.3s;
+  }
+  .app-card:hover .card-motif { opacity: 0.22; }
+  .card-motif svg { width: 100%; height: 100%; display: block; }
+  /* finance motif uses candles drawn via the existing .card-candles when custom;
+     for the generic finance cards we use an upward trend line svg */
+
   /* ── FILTER TABS ── */
   .filter-bar {
     display: flex;
@@ -185,6 +251,41 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
+  }
+
+  /* ── CATEGORY GROUPS (All view) ── */
+  .app-groups { display: flex; flex-direction: column; gap: 36px; }
+  .cat-group { animation: fadeUp 0.5s ease both; }
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cat-accent, var(--accent));
+    margin-bottom: 16px;
+  }
+  .cat-header .cat-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--cat-accent, var(--accent));
+    box-shadow: 0 0 8px var(--cat-accent, var(--accent));
+  }
+  .cat-header .cat-count {
+    font-size: 10px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 1px 8px;
+    letter-spacing: 0.05em;
+  }
+  .cat-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin-left: 4px;
   }
 
   /* ── APP CARD ── */
@@ -626,19 +727,22 @@
     </div>
   </div>
 
+  <!-- FAVOURITES QUICK LINKS -->
+  <div class="fav-bar" id="fav-bar"></div>
+
   <!-- FILTER -->
   <div class="filter-bar">
     <button class="filter-btn active" data-filter="all">All</button>
     <button class="filter-btn" data-filter="finance">Finance</button>
     <button class="filter-btn" data-filter="health">Health</button>
+    <button class="filter-btn" data-filter="productivity">Productivity</button>
+    <button class="filter-btn" data-filter="ai">AI</button>
+    <button class="filter-btn" data-filter="education">Education</button>
     <button class="filter-btn" data-filter="tools">Tools</button>
     <button class="filter-btn" data-filter="games">Games</button>
   </div>
 
-  <!-- SECTION LABEL -->
-  <div class="section-label">Published Apps</div>
-
-  <!-- APP GRID -->
+  <!-- APP GRID / GROUPS -->
   <div class="app-grid" id="app-grid">
     <!-- cards injected by JS -->
   </div>
@@ -666,74 +770,133 @@
 
 <script>
 // ─────────────────────────────────────────────────────────────
+// CATEGORY THEMES — each category has a signature accent.
+// Cards inherit these automatically; no per-app colors needed.
+// ─────────────────────────────────────────────────────────────
+const CATEGORY_THEMES = {
+  finance:      { filter:"finance",      label:"Finance",      accent:"#f0b860" }, // gold
+  health:       { filter:"health",       label:"Health",       accent:"#c8f060" }, // lime
+  productivity: { filter:"productivity", label:"Productivity", accent:"#60c8f0" }, // sky blue
+  ai:           { filter:"ai",           label:"AI",           accent:"#7b61ff" }, // purple
+  education:    { filter:"education",    label:"Education",     accent:"#d4a843" }, // amber
+  tools:        { filter:"tools",        label:"Tools",        accent:"#f0ede8" }, // off-white
+  games:        { filter:"games",        label:"Games",        accent:"#ff6b6b" }, // red
+};
+
+// Turn a hex like #f0b860 into rgba string at given alpha
+function hexA(hex, a) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+
+// Build full color set from a category key
+function themeColors(catKey) {
+  const t = CATEGORY_THEMES[catKey] || CATEGORY_THEMES.tools;
+  return {
+    filter: t.filter,
+    category: t.label,
+    accentColor: t.accent,
+    glowColor: hexA(t.accent, 0.05),
+    iconBg: hexA(t.accent, 0.1),
+    iconBorder: hexA(t.accent, 0.22)
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
 // CONFIG — add/edit entries here when you publish a new app.
-// Repos NOT listed here will auto-appear with defaults.
-// Set hidden:true to suppress a repo entirely.
+// Only need: name, tagline, tags, cat (category key), icon.
+// Colors are derived from the category automatically.
+// Use customCard for bespoke styles. Set hidden:true to suppress.
+// Repos NOT listed here auto-appear with category "tools".
+// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// CONFIG — OPTIONAL OVERRIDES ONLY.
+// You do NOT need to add anything here for a new app: the hub
+// fetches each app's own <title>, <meta description> and
+// theme-color live, and infers its category from keywords.
+//
+// Add an entry here ONLY to override the auto-detected values,
+// to assign a bespoke customCard style, or to hide a repo.
+// Any field you omit falls back to the auto-fetched value.
 // ─────────────────────────────────────────────────────────────
 const APP_CONFIG = {
   "gridlock-tic-tac-toe": {
     name: "GridLock",
     tagline: "Classic Tic-Tac-Toe with three AI difficulty levels — from casual to unbeatable minimax.",
     tags: ["minimax AI", "2-player", "stats"],
-    category: "Games", filter: "games", icon: "⚔️",
-    accentColor: "#60c8f0", glowColor: "rgba(96,200,240,0.06)",
-    iconBg: "rgba(96,200,240,0.1)", iconBorder: "rgba(96,200,240,0.2)"
+    cat: "games", icon: "⚔️"
   },
   "bmi-body-calculator": {
     name: "BMI & TDEE",
     tagline: "Body composition calculator — BMI, daily calorie needs, macro targets and goal weight estimator.",
     tags: ["Mifflin-St Jeor", "macros", "goals"],
-    category: "Health", filter: "health", icon: "🏃",
-    accentColor: "#c8f060", glowColor: "rgba(200,240,96,0.05)",
-    iconBg: "rgba(200,240,96,0.1)", iconBorder: "rgba(200,240,96,0.2)"
+    cat: "health", icon: "🏃"
   },
   "skycast-weather-app": {
     name: "SkyCast",
     tagline: "Live weather forecasts powered by Open-Meteo with best-match regional model and city search.",
     tags: ["Open-Meteo", "autocomplete", "7-day"],
-    category: "Tools", filter: "tools", icon: "🌤",
-    accentColor: "#60c8f0", glowColor: "rgba(96,200,240,0.06)",
-    iconBg: "rgba(96,200,240,0.1)", iconBorder: "rgba(96,200,240,0.2)"
+    cat: "tools", icon: "🌤"
   },
   "flow-split-budget-allocator": {
     name: "FlowSplit",
     tagline: "Smart budget planner using the 50/30/20 framework with custom sliders and 30-year investment simulation.",
     tags: ["50/30/20", "compound growth", "chart"],
-    category: "Finance", filter: "finance", icon: "💰",
-    accentColor: "#f0b860", glowColor: "rgba(240,184,96,0.06)",
-    iconBg: "rgba(240,184,96,0.1)", iconBorder: "rgba(240,184,96,0.2)"
+    cat: "finance", icon: "💰"
   },
   "net-salary-calculator": {
     name: "NetSalary",
     tagline: "Gross-to-net salary calculator for Italy, Belgium, Luxembourg, Finland and Switzerland with editable tax brackets.",
     tags: ["multi-country", "tax brackets", "IT · BE · LU"],
-    category: "Finance", filter: "finance", icon: "🧾",
-    accentColor: "#f0b860", glowColor: "rgba(240,184,96,0.06)",
-    iconBg: "rgba(240,184,96,0.1)", iconBorder: "rgba(240,184,96,0.2)"
+    cat: "finance", icon: "🧾"
   },
   "spendlog": {
     name: "SpendLog",
     tagline: "Daily expense tracker with category tags, calendar view and monthly breakdowns. Stays on your device.",
     tags: ["local storage", "categories", "calendar"],
-    category: "Finance", filter: "finance", icon: "📒",
-    accentColor: "#f0b860", glowColor: "rgba(240,184,96,0.06)",
-    iconBg: "rgba(240,184,96,0.1)", iconBorder: "rgba(240,184,96,0.2)"
+    cat: "finance", icon: "📒"
   },
   "wealthlens": {
     name: "WealthLens",
     tagline: "Month-by-month net worth tracker across cash, investments, crypto and more. Visualise your growth over time.",
     tags: ["net worth", "timeline", "chart"],
-    category: "Finance", filter: "finance", icon: "📈",
-    accentColor: "#c8f060", glowColor: "rgba(200,240,96,0.05)",
-    iconBg: "rgba(200,240,96,0.1)", iconBorder: "rgba(200,240,96,0.2)"
+    cat: "finance", icon: "📈"
   },
   "compoundcalculator.github.io": {
     name: "CompoundCalc",
     tagline: "Compound interest calculator with growth charts and yearly breakdowns to plan long-term savings goals.",
     tags: ["compound interest", "chart", "savings"],
-    category: "Finance", filter: "finance", icon: "🔢",
-    accentColor: "#f0b860", glowColor: "rgba(240,184,96,0.06)",
-    iconBg: "rgba(240,184,96,0.1)", iconBorder: "rgba(240,184,96,0.2)"
+    cat: "finance", icon: "🔢"
+  },
+  "focus-flow": {
+    name: "FocusFlow",
+    tagline: "Pomodoro deep-work timer with break mind-games, session history and chime + flash alerts.",
+    tags: ["pomodoro", "deep work", "break games"],
+    cat: "productivity", icon: "⏱"
+  },
+  "fade-scape": {
+    name: "FadeScape",
+    tagline: "Drag through four centuries as the same city slowly loses its colour, life and detail. A generative art piece.",
+    tags: ["generative art", "interactive", "SVG"],
+    cat: "tools", icon: "🎨"
+  },
+  "season-scope": {
+    name: "SeasonScope",
+    tagline: "Monthly seasonality dashboard — spot the months a stock, forex pair or commodity consistently gains or bleeds.",
+    tags: ["seasonality", "Yahoo Finance", "matrix"],
+    cat: "finance", icon: "📅"
+  },
+  "chrono-day": {
+    name: "ChronoDay",
+    tagline: "Discover the most significant events that happened on today's date throughout history, powered by Wikipedia.",
+    tags: ["on this day", "Wikipedia", "history"],
+    cat: "education", icon: "📜"
+  },
+  "az900-azure-matrix": {
+    name: "AzureMatrix",
+    tagline: "Complete AZ-900 Azure Fundamentals study hub — 3 learning paths, 9 modules and a 40-question quiz mode.",
+    tags: ["AZ-900", "Azure", "quiz"],
+    cat: "education", icon: "☁️"
   },
   // Repos to always hide (non-app repos)
   "giovanniminchio98.github.io": { hidden: true },
@@ -742,60 +905,121 @@ const APP_CONFIG = {
     name: "Zibaldone.AI",
     tagline: "Open knowledge base for agentic AI — learning paths, concept cards, tools, papers and a live news feed.",
     tags: ["agentic AI", "LLMs", "knowledge base"],
-    category: "AI", filter: "tools", icon: "⬡",
-    accentColor: "#7b61ff", glowColor: "rgba(123,97,255,0.08)",
-    iconBg: "rgba(123,97,255,0.12)", iconBorder: "rgba(123,97,255,0.25)",
-    customCard: "zibaldone"
+    cat: "ai", icon: "⬡",
+    customCard: "zibaldone", favorite: true
   },
   "Annum": {
     name: "Annum",
     tagline: "A chronicle of history — travel through 85 cosmic and human events from the Big Bang to today.",
     tags: ["history", "timeline", "interactive"],
-    category: "Education", filter: "tools", icon: "✦",
-    accentColor: "#d4a843", glowColor: "rgba(212,168,67,0.06)",
-    iconBg: "rgba(212,168,67,0.1)", iconBorder: "rgba(212,168,67,0.2)",
-    customCard: "annum"
+    cat: "education", icon: "✦",
+    customCard: "annum", favorite: true
   },
   "crypto-scope": {
     name: "CryptoScope",
     tagline: "Real-time candlestick charts, Monte Carlo forecasts, regime detection and quant risk analytics for top 20 coins.",
     tags: ["CoinGecko", "Monte Carlo", "candlesticks"],
-    category: "Finance", filter: "finance", icon: "₿",
-    accentColor: "#c8f060", glowColor: "rgba(200,240,96,0.05)",
-    iconBg: "rgba(200,240,96,0.08)", iconBorder: "rgba(200,240,96,0.2)",
+    cat: "finance", icon: "₿",
     customCard: "cryptoscope"
   }
 };
 
-// Default styling for unconfigured repos
+// Default for unconfigured repos → Tools category
 function defaultConfig(repoName) {
-  const accents = [
-    { accentColor:"#c8f060", glowColor:"rgba(200,240,96,0.05)", iconBg:"rgba(200,240,96,0.1)", iconBorder:"rgba(200,240,96,0.2)" },
-    { accentColor:"#f0b860", glowColor:"rgba(240,184,96,0.06)", iconBg:"rgba(240,184,96,0.1)", iconBorder:"rgba(240,184,96,0.2)" },
-    { accentColor:"#60c8f0", glowColor:"rgba(96,200,240,0.06)", iconBg:"rgba(96,200,240,0.1)", iconBorder:"rgba(96,200,240,0.2)" },
-  ];
-  const pick = accents[repoName.length % 3];
   return {
-    name: repoName.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()),
+    name: repoName.replace(/[-_.]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()).replace(/ Github Io$/i,''),
     tagline: "A standalone web tool — click to open.",
     tags: ["web app"],
-    category: "Tools", filter: "tools", icon: "🛠",
-    ...pick
+    cat: "tools", icon: "🛠"
   };
 }
 
 // ─────────────────────────────────────────────────────────────
-// GITHUB API FETCH
+// CATEGORY INFERENCE — keyword scoring on title + description
+// ─────────────────────────────────────────────────────────────
+const CATEGORY_KEYWORDS = {
+  finance:      ["finance","salary","budget","money","crypto","bitcoin","investment","invest","tax","expense","spending","wealth","net worth","portfolio","compound","interest","savings","trading","market","stock","coin"],
+  health:       ["health","bmi","calorie","fitness","workout","diet","nutrition","weight","tdee","macro","body","exercise","wellness","sleep","medical"],
+  productivity: ["productivity","todo","task","note","pomodoro","timer","focus","habit","planner","calendar","schedule","organize","time"],
+  ai:           ["ai","agentic","llm","gpt","claude","machine learning","neural","model","prompt","knowledge base","chatbot"],
+  education:    ["history","learn","education","study","quiz","chronicle","timeline","language","flashcard","course","trivia","explore"],
+  games:        ["game","play","puzzle","tic-tac-toe","wordle","chess","arcade","minimax","score","win"],
+  tools:        ["weather","forecast","convert","calculator","generator","tracker","dashboard","utility","tool","map","network"],
+};
+
+function inferCategory(text) {
+  const t = (text || "").toLowerCase();
+  let best = "tools", bestScore = 0;
+  for (const [cat, words] of Object.entries(CATEGORY_KEYWORDS)) {
+    let score = 0;
+    for (const w of words) if (t.includes(w)) score++;
+    // weight specific categories above the catch-all "tools"
+    if (cat !== "tools") score *= 1.2;
+    if (score > bestScore) { bestScore = score; best = cat; }
+  }
+  return bestScore > 0 ? best : "tools";
+}
+
+// Pick an emoji icon from inferred category
+const CATEGORY_ICONS = {
+  finance:"💰", health:"🏃", productivity:"✅", ai:"🤖", education:"📚", tools:"🛠", games:"🎮"
+};
+
+// ─────────────────────────────────────────────────────────────
+// FETCH EACH APP'S OWN <head> META (title, description, theme-color)
+// Uses a CORS proxy fallback if direct fetch is blocked.
+// ─────────────────────────────────────────────────────────────
+const CORS_PROXIES = [
+  url => url,                                              // try direct first
+  url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+];
+
+async function fetchMeta(url) {
+  // Timeout helper (AbortSignal.timeout isn't on older iOS Safari)
+  const withTimeout = (ms) => {
+    if (AbortSignal.timeout) return AbortSignal.timeout(ms);
+    const ac = new AbortController();
+    setTimeout(() => ac.abort(), ms);
+    return ac.signal;
+  };
+  for (const wrap of CORS_PROXIES) {
+    try {
+      const res = await fetch(wrap(url), { signal: withTimeout(7000) });
+      if (!res.ok) continue;
+      const html = await res.text();
+      if (!html || html.length < 30) continue;
+      const doc = new DOMParser().parseFromString(html, "text/html");
+
+      const rawTitle = (doc.querySelector("title")?.textContent || "").trim();
+      const metaTitle = doc.querySelector('meta[name="apple-mobile-web-app-title"]')?.content?.trim();
+      const desc = (
+        doc.querySelector('meta[name="description"]')?.content ||
+        doc.querySelector('meta[property="og:description"]')?.content ||
+        ""
+      ).trim();
+      const themeColor = doc.querySelector('meta[name="theme-color"]')?.content?.trim();
+
+      // Name: prefer the app-title meta, else the part of <title> before a dash
+      let name = metaTitle || rawTitle.split(/[—\-–·|]/)[0].trim();
+      if (!name) continue;
+
+      return { name, tagline: desc, themeColor, rawTitle };
+    } catch (e) { /* try next proxy */ }
+  }
+  return null;
+}
+
+// ─────────────────────────────────────────────────────────────
+// MAIN FETCH — list repos, then enrich each from its own page
 // ─────────────────────────────────────────────────────────────
 const GITHUB_USER = "giovanniminchio98";
-const FILTER_CATEGORIES = ["all","finance","health","tools","games"];
 let allApps = [];
 let currentFilter = "all";
 
 async function fetchApps() {
   showSkeleton();
   try {
-    // Fetch all repos (up to 100; add &page=2 if you ever exceed that)
     const res = await fetch(
       `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=pushed`,
       { headers: { Accept: "application/vnd.github+json" } }
@@ -803,22 +1027,46 @@ async function fetchApps() {
     if (!res.ok) throw new Error(`GitHub API ${res.status}`);
     const repos = await res.json();
 
-    allApps = repos
-      .filter(r => {
-        const cfg = APP_CONFIG[r.name];
-        if (cfg?.hidden) return false;           // explicitly hidden
-        return r.has_pages;                       // only published Pages repos
-      })
-      .map(r => {
-        const cfg = APP_CONFIG[r.name] || defaultConfig(r.name);
-        // Derive GH Pages URL
-        const url = r.homepage && r.homepage.startsWith("http")
-          ? r.homepage
-          : `https://${GITHUB_USER}.github.io/${r.name}/`;
-        return { ...cfg, url, repoName: r.name, pushedAt: r.pushed_at };
-      });
+    const pageRepos = repos.filter(r => {
+      const cfg = APP_CONFIG[r.name];
+      if (cfg?.hidden) return false;
+      return r.has_pages;
+    });
+
+    // Enrich every repo in parallel from its own published page
+    allApps = await Promise.all(pageRepos.map(async r => {
+      const url = r.homepage && r.homepage.startsWith("http")
+        ? r.homepage
+        : `https://${GITHUB_USER}.github.io/${r.name}/`;
+
+      const override = APP_CONFIG[r.name];   // optional manual override
+      const meta = await fetchMeta(url);      // auto-pulled from the app
+
+      // Resolve each field: manual override > fetched meta > sensible default
+      const fallback = defaultConfig(r.name);
+      const name    = override?.name    || meta?.name    || fallback.name;
+      const tagline = override?.tagline || meta?.tagline || (r.description || fallback.tagline);
+      const searchText = `${name} ${tagline} ${r.description || ""} ${r.name} ${(r.topics||[]).join(" ")}`;
+      const cat     = override?.cat     || inferCategory(searchText);
+      const icon    = override?.icon    || CATEGORY_ICONS[cat] || "🛠";
+      const tags    = override?.tags    || (r.topics?.slice(0,3)) || fallback.tags;
+
+      const colors = themeColors(cat);
+      return {
+        name, tagline, tags, icon, cat,
+        customCard: override?.customCard,
+        favorite: !!override?.favorite,
+        ...colors,
+        url, repoName: r.name, pushedAt: r.pushed_at
+      };
+    }));
+
+    // Always alphabetical by name (case-insensitive) — editing a repo
+    // no longer reshuffles it to the top.
+    allApps.sort((a,b) => a.name.localeCompare(b.name, undefined, {sensitivity:"base"}));
 
     updateCount(allApps.length);
+    renderFavorites();
     renderCards(currentFilter);
   } catch (err) {
     showError(err.message);
@@ -826,69 +1074,126 @@ async function fetchApps() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// FAVORITES — quick-link chips pinned at the very top
+// ─────────────────────────────────────────────────────────────
+function renderFavorites() {
+  const bar = document.getElementById('fav-bar');
+  const favs = allApps.filter(a => a.favorite);
+  if (!favs.length) { bar.innerHTML = ''; return; }
+  bar.innerHTML = `
+    <span class="fav-label">★ Favourites</span>
+    ${favs.map(a => `
+      <a href="${a.url}" target="_blank" rel="noopener" class="fav-chip"
+         style="--accent-color:${a.accentColor}">
+        <span class="fav-icon">${a.icon}</span>${a.name}<span class="fav-arrow">↗</span>
+      </a>`).join('')}
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────
 // RENDER
 // ─────────────────────────────────────────────────────────────
+const CATEGORY_ORDER = ["finance","health","productivity","ai","education","tools","games"];
+
+// SVG motif per category (drawn bottom-right, low opacity)
+const CATEGORY_MOTIFS = {
+  finance: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"><polyline points="4,52 20,36 32,44 60,10"/><polyline points="46,10 60,10 60,24"/></svg>`,
+  health: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"><polyline points="2,34 16,34 24,16 34,50 42,34 62,34"/></svg>`,
+  productivity: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"><circle cx="32" cy="34" r="22"/><polyline points="32,20 32,34 44,40"/><line x1="32" y1="4" x2="32" y2="10"/></svg>`,
+  ai: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"><circle cx="14" cy="20" r="5"/><circle cx="50" cy="14" r="5"/><circle cx="44" cy="48" r="5"/><circle cx="18" cy="46" r="5"/><line x1="14" y1="20" x2="50" y2="14"/><line x1="50" y1="14" x2="44" y2="48"/><line x1="44" y1="48" x2="18" y2="46"/><line x1="18" y1="46" x2="14" y2="20"/></svg>`,
+  education: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 22 L32 10 L58 22 L32 34 Z"/><path d="M16 27 L16 42 Q32 52 48 42 L48 27"/></svg>`,
+  tools: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"><path d="M40 8 a12 12 0 0 0 -14 18 L8 44 l12 12 l18-18 a12 12 0 0 0 18-14 l-9 9 l-9-2 l-2-9 z"/></svg>`,
+  games: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"><rect x="6" y="20" width="52" height="28" rx="12"/><line x1="18" y1="30" x2="18" y2="40"/><line x1="13" y1="35" x2="23" y2="35"/><circle cx="44" cy="32" r="3"/><circle cx="50" cy="40" r="3"/></svg>`,
+};
+
+function buildCard(app, i) {
+  const delay = 0.04 + i * 0.05;
+  const catClass = ` cat-${app.cat}`;
+  const customClass = app.customCard ? ` card-${app.customCard}` : '';
+
+  let badge = `<span class="app-badge badge-live">● Live</span>`;
+  if (app.customCard === 'zibaldone') badge = `<span class="zib-live-badge">◈ Live</span>`;
+  if (app.customCard === 'annum')     badge = `<span class="annum-live-badge">✦ Live</span>`;
+  if (app.customCard === 'cryptoscope') badge = `<span class="cryptoscope-badge">▲ Live</span>`;
+
+  let decoration = '';
+  if (app.customCard === 'zibaldone') decoration = `<div class="card-bg-grid"></div>`;
+  else if (app.customCard === 'annum') decoration = `<div class="card-stars"></div>`;
+  else if (app.customCard === 'cryptoscope') decoration = `
+    <div class="card-candles">
+      ${[
+        {bull:false, bh:18, wt:4, wb:8},
+        {bull:true,  bh:24, wt:6, wb:6},
+        {bull:false, bh:12, wt:3, wb:5},
+        {bull:true,  bh:30, wt:8, wb:4},
+        {bull:true,  bh:20, wt:5, wb:7},
+        {bull:false, bh:14, wt:3, wb:6},
+        {bull:true,  bh:28, wt:7, wb:5},
+      ].map(c => `
+        <div class="c" style="color:${c.bull ? '#c8f060' : '#ff6b6b'}">
+          <div class="wick" style="height:${c.wt}px"></div>
+          <div class="body" style="height:${c.bh}px;background:currentColor"></div>
+          <div class="wick" style="height:${c.wb}px"></div>
+        </div>`).join('')}
+    </div>`;
+  else decoration = `<div class="card-motif">${CATEGORY_MOTIFS[app.cat] || CATEGORY_MOTIFS.tools}</div>`;
+
+  return `
+  <a href="${app.url}" target="_blank" rel="noopener" class="app-card${catClass}${customClass}"
+     style="--accent-color:${app.accentColor};--glow-color:${app.glowColor};--icon-bg:${app.iconBg};--icon-border:${app.iconBorder};animation-delay:${delay}s">
+    ${decoration}
+    <div class="card-top">
+      <div class="app-icon">${app.icon}</div>
+      ${badge}
+    </div>
+    <div class="app-name">${app.name}</div>
+    <div class="app-tagline">${app.tagline}</div>
+    <div class="app-tags">
+      ${app.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+    </div>
+    <div class="card-footer">
+      <span class="card-category">${app.category}</span>
+      <span class="launch-arrow">↗</span>
+    </div>
+  </a>`;
+}
+
 function renderCards(filter) {
   currentFilter = filter;
-  const grid = document.getElementById('app-grid');
+  const container = document.getElementById('app-grid');
   const list = filter === 'all' ? allApps : allApps.filter(a => a.filter === filter);
 
   if (!list.length) {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:40px 0;">No apps in this category yet.</div>`;
+    container.className = 'app-grid';
+    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:40px 0;">No apps in this category yet.</div>`;
     return;
   }
 
-  grid.innerHTML = list.map((app, i) => {
-    const delay = 0.04 + i * 0.05;
-    const customClass = app.customCard ? ` card-${app.customCard}` : '';
-
-    // Custom badge per card type
-    let badge = `<span class="app-badge badge-live">● Live</span>`;
-    if (app.customCard === 'zibaldone') badge = `<span class="zib-live-badge">◈ Live</span>`;
-    if (app.customCard === 'annum')     badge = `<span class="annum-live-badge">✦ Live</span>`;
-    if (app.customCard === 'cryptoscope') badge = `<span class="cryptoscope-badge">▲ Live</span>`;
-
-    // Decorative bg elements
-    let decoration = '';
-    if (app.customCard === 'zibaldone') decoration = `<div class="card-bg-grid"></div>`;
-    if (app.customCard === 'annum')     decoration = `<div class="card-stars"></div>`;
-    if (app.customCard === 'cryptoscope') decoration = `
-      <div class="card-candles">
-        ${[
-          {bull:false, bh:18, wt:4, wb:8},
-          {bull:true,  bh:24, wt:6, wb:6},
-          {bull:false, bh:12, wt:3, wb:5},
-          {bull:true,  bh:30, wt:8, wb:4},
-          {bull:true,  bh:20, wt:5, wb:7},
-          {bull:false, bh:14, wt:3, wb:6},
-          {bull:true,  bh:28, wt:7, wb:5},
-        ].map(c => `
-          <div class="c" style="color:${c.bull ? '#c8f060' : '#ff6b6b'}">
-            <div class="wick" style="height:${c.wt}px"></div>
-            <div class="body" style="height:${c.bh}px;background:currentColor"></div>
-            <div class="wick" style="height:${c.wb}px"></div>
-          </div>`).join('')}
-      </div>`;
-
-    return `
-    <a href="${app.url}" target="_blank" rel="noopener" class="app-card${customClass}"
-       style="--accent-color:${app.accentColor};--glow-color:${app.glowColor};--icon-bg:${app.iconBg};--icon-border:${app.iconBorder};animation-delay:${delay}s">
-      ${decoration}
-      <div class="card-top">
-        <div class="app-icon">${app.icon}</div>
-        ${badge}
-      </div>
-      <div class="app-name">${app.name}</div>
-      <div class="app-tagline">${app.tagline}</div>
-      <div class="app-tags">
-        ${app.tags.map(t => `<span class="tag">${t}</span>`).join('')}
-      </div>
-      <div class="card-footer">
-        <span class="card-category">${app.category}</span>
-        <span class="launch-arrow">↗</span>
-      </div>
-    </a>`;
-  }).join('');
+  if (filter === 'all') {
+    // Grouped view: section header + grid per category
+    container.className = 'app-groups';
+    const groups = CATEGORY_ORDER
+      .map(catKey => {
+        const t = CATEGORY_THEMES[catKey];
+        const apps = list.filter(a => a.filter === catKey);
+        if (!apps.length) return '';
+        const cards = apps.map((a,i) => buildCard(a,i)).join('');
+        return `
+          <div class="cat-group">
+            <div class="cat-header" style="--cat-accent:${t.accent}">
+              <span class="cat-dot"></span>${t.label}
+              <span class="cat-count">${apps.length}</span>
+            </div>
+            <div class="app-grid">${cards}</div>
+          </div>`;
+      })
+      .join('');
+    container.innerHTML = groups;
+  } else {
+    // Flat grid for a single category
+    container.className = 'app-grid';
+    container.innerHTML = list.map((a,i) => buildCard(a,i)).join('');
+  }
 }
 
 function showSkeleton() {
