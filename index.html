@@ -1281,7 +1281,7 @@ function renderFavorites() {
   bar.innerHTML = `
     <span class="fav-label">★ Favourites</span>
     ${favs.map(a => `
-      <a href="${a.url}" target="_blank" rel="noopener" class="fav-chip"
+      <a href="${a.url}" class="fav-chip"
          style="--accent-color:${a.accentColor}">
         <span class="fav-icon">${a.icon}</span>${a.name}<span class="fav-arrow">↗</span>
       </a>`).join('')}
@@ -1346,7 +1346,7 @@ function buildCard(app, i) {
   else decoration = `<div class="card-motif">${CATEGORY_MOTIFS[app.cat] || CATEGORY_MOTIFS.tools}</div>`;
 
   return `
-  <a href="${app.url}" target="_blank" rel="noopener" class="app-card${catClass}${customClass}"
+  <a href="${app.url}" class="app-card${catClass}${customClass}"
      style="--accent-color:${app.accentColor};--glow-color:${app.glowColor};--icon-bg:${app.iconBg};--icon-border:${app.iconBorder};animation-delay:${delay}s">
     ${decoration}
     <div class="card-top">
