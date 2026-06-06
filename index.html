@@ -106,6 +106,36 @@
     margin: 0 auto;
   }
 
+  /* ── TOP NAV ── */
+  .top-nav {
+    margin-top: 22px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    padding: 9px 18px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.2s;
+  }
+  .nav-link-primary { border-color: rgba(200,240,96,0.4); color: var(--accent); }
+  .nav-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,240,96,0.06);
+    transform: translateY(-2px);
+  }
+
   /* ── STATS BAR ── */
   .stats-bar {
     display: flex;
@@ -190,7 +220,8 @@
 
   /* ── PER-CATEGORY CARD STYLES ── */
   /* Each category gets a subtle background tint + signature motif.
-     The 3 bespoke cards (zibaldone/annum/cryptoscope) override these. */
+     The bespoke cards (zibaldone/annum/cryptoscope/skycast/europress)
+     override these but keep their accent in the category colour. */
 
   .app-card.cat-finance     { background: linear-gradient(160deg, #1c1a14 0%, var(--card) 55%); }
   .app-card.cat-health      { background: linear-gradient(160deg, #181c14 0%, var(--card) 55%); }
@@ -594,28 +625,30 @@
 
 
 
-  /* ── CUSTOM CARD: CRYPTOSCOPE (candlestick, quant oracle, lime/red) ── */
+  /* ── CUSTOM CARD: CRYPTOSCOPE (candlestick quant oracle — FINANCE gold) ──
+     Accent follows the Finance category colour (#f0b860). The green/red
+     candlesticks below are semantic data colours (bull/bear), not theme. */
   .app-card.card-cryptoscope {
-    background: #0b0f0b;
-    border-color: #1a2a1a;
+    background: linear-gradient(160deg, #14100a 0%, #0d0f0c 60%);
+    border-color: #2a2114;
   }
   .app-card.card-cryptoscope::before {
-    background: linear-gradient(90deg, #c8f060, #ff6b6b);
+    background: linear-gradient(90deg, #f0b860, #ff6b6b);
   }
   .app-card.card-cryptoscope:hover {
-    border-color: #c8f060;
-    box-shadow: 0 12px 40px rgba(200,240,96,0.12);
+    border-color: #f0b860;
+    box-shadow: 0 12px 40px rgba(240,184,96,0.14);
   }
-  .app-card.card-cryptoscope .app-name { color: #c8f060; }
-  .app-card.card-cryptoscope .card-category { color: #c8f060; }
-  .app-card.card-cryptoscope .app-tagline { color: #556655; }
+  .app-card.card-cryptoscope .app-name { color: #f0d8a0; }
+  .app-card.card-cryptoscope .card-category { color: #f0b860; }
+  .app-card.card-cryptoscope .app-tagline { color: #7a6a48; }
   .app-card.card-cryptoscope .tag {
-    border-color: rgba(200,240,96,0.2);
-    color: #c8f060;
-    background: rgba(200,240,96,0.06);
+    border-color: rgba(240,184,96,0.22);
+    color: #f0b860;
+    background: rgba(240,184,96,0.07);
   }
-  .app-card.card-cryptoscope .card-footer { border-color: #1a2a1a; }
-  .app-card.card-cryptoscope:hover .launch-arrow { color: #c8f060; }
+  .app-card.card-cryptoscope .card-footer { border-color: #2a2114; }
+  .app-card.card-cryptoscope:hover .launch-arrow { color: #f0b860; }
   /* mini candlestick bars decoration */
   .card-candles {
     position: absolute;
@@ -648,9 +681,129 @@
     text-transform: uppercase;
     padding: 4px 10px;
     border-radius: 99px;
-    border: 1px solid rgba(200,240,96,0.35);
-    color: #c8f060;
-    background: rgba(200,240,96,0.07);
+    border: 1px solid rgba(240,184,96,0.35);
+    color: #f0b860;
+    background: rgba(240,184,96,0.07);
+    white-space: nowrap;
+  }
+
+  /* ── CUSTOM CARD: SKYCAST (clear-sky dawn gradient — TOOLS off-white) ──
+     Accent stays the Tools off-white; the blue sky + sun is decoration. */
+  .app-card.card-skycast {
+    background: linear-gradient(165deg, #101a2b 0%, #131722 45%, var(--card) 100%);
+    border-color: #233246;
+    --accent-color: #f0ede8;
+    --icon-bg: rgba(240,237,232,0.08);
+    --icon-border: rgba(160,200,240,0.30);
+  }
+  .app-card.card-skycast::before { background: linear-gradient(90deg, #f0ede8, #8cc6f0); }
+  .app-card.card-skycast:hover {
+    border-color: #8cc6f0;
+    box-shadow: 0 12px 40px rgba(120,180,240,0.18);
+  }
+  .app-card.card-skycast .app-name { color: #f3f6fb; }
+  .app-card.card-skycast .card-category { color: #f0ede8; }
+  .app-card.card-skycast .app-tagline { color: #7e90a8; }
+  .app-card.card-skycast .tag {
+    border-color: rgba(160,200,240,0.22);
+    color: #cfe2f5;
+    background: rgba(140,198,240,0.06);
+  }
+  .app-card.card-skycast .card-footer { border-color: #233246; }
+  .app-card.card-skycast:hover .launch-arrow { color: #8cc6f0; }
+  /* sun + cloud decoration */
+  .card-sky {
+    position: absolute;
+    top: 10px; right: 12px;
+    width: 78px; height: 60px;
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.3s, transform 0.4s;
+  }
+  .app-card.card-skycast:hover .card-sky { opacity: 0.8; transform: translateY(2px); }
+  .card-sky .sun {
+    position: absolute;
+    top: 2px; right: 30px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe9a8 0%, #f0c060 70%);
+    box-shadow: 0 0 14px rgba(240,200,120,0.6);
+  }
+  .card-sky .cloud {
+    position: absolute;
+    bottom: 4px; right: 2px;
+    width: 46px; height: 16px;
+    border-radius: 99px;
+    background: rgba(220,235,250,0.85);
+    box-shadow: -14px 0 0 -3px rgba(220,235,250,0.7), 16px 1px 0 -4px rgba(220,235,250,0.6);
+  }
+  .skycast-badge {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 1px solid rgba(160,200,240,0.4);
+    color: #cfe2f5;
+    background: rgba(140,198,240,0.08);
+    white-space: nowrap;
+  }
+
+  /* ── CUSTOM CARD: EUROPRESS (newsprint masthead — TOOLS off-white) ──
+     Monochrome newspaper look; accent is the Tools off-white. */
+  .app-card.card-europress {
+    background: #0c0c0c;
+    border-color: #2c2c2c;
+    --accent-color: #f0ede8;
+    --icon-bg: rgba(240,237,232,0.07);
+    --icon-border: rgba(240,237,232,0.22);
+  }
+  .app-card.card-europress::before { background: linear-gradient(90deg, #f0ede8, #888); }
+  .app-card.card-europress:hover {
+    border-color: #f0ede8;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  }
+  .app-card.card-europress .app-name {
+    color: #f4f1ec;
+    letter-spacing: 0.02em;
+  }
+  .app-card.card-europress .card-category { color: #cbcbcb; }
+  .app-card.card-europress .app-tagline { color: #8a8a8a; }
+  .app-card.card-europress .tag {
+    border-color: rgba(240,237,232,0.18);
+    color: #cbcbcb;
+    background: rgba(240,237,232,0.04);
+  }
+  .app-card.card-europress .card-footer { border-color: #2c2c2c; }
+  .app-card.card-europress:hover .launch-arrow { color: #f0ede8; }
+  /* newspaper column-rule decoration */
+  .card-news {
+    position: absolute;
+    bottom: 10px; right: 12px;
+    display: flex;
+    gap: 8px;
+    pointer-events: none;
+    opacity: 0.16;
+    transition: opacity 0.3s;
+  }
+  .app-card.card-europress:hover .card-news { opacity: 0.3; }
+  .card-news .col {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 26px;
+  }
+  .card-news .col span { height: 2px; background: #f0ede8; border-radius: 1px; }
+  .card-news .col span:first-child { height: 3px; background: #ff6b6b; width: 70%; } /* dateline tick */
+  .europress-badge {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 1px solid rgba(240,237,232,0.3);
+    color: #cbcbcb;
+    background: rgba(240,237,232,0.05);
     white-space: nowrap;
   }
 
@@ -707,6 +860,9 @@
     <p class="eyebrow"><span></span>Web App Suite</p>
     <h1>App<em>Vault</em></h1>
     <p class="subtitle">A curated collection of standalone web tools — calculators, dashboards, games and more. All free, mobile-friendly, no install needed.</p>
+    <nav class="top-nav">
+      <a class="nav-link nav-link-primary" href="about.html">About Giovanni →</a>
+    </nav>
   </header>
 
   <!-- STATS -->
@@ -770,7 +926,9 @@
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
     </a>
   </div>
-  <div style="margin-top:16px;">AppVault &nbsp;·&nbsp; Built by Giovanni &nbsp;·&nbsp; All tools are standalone static apps for personal use. No data collected or stored. Not professional advice.</div>
+  <div style="margin-top:16px;">
+    <a href="about.html" style="color:var(--accent);text-decoration:none;">About Giovanni</a> &nbsp;·&nbsp; AppVault &nbsp;·&nbsp; Built by Giovanni &nbsp;·&nbsp; All tools are standalone static apps for personal use. No data collected or stored. Not professional advice.
+  </div>
 </footer>
 
 <script>
@@ -839,9 +997,17 @@ const APP_CONFIG = {
   },
   "skycast-weather-app": {
     name: "SkyCast",
-    tagline: "Live weather forecasts powered by Open-Meteo with best-match regional model and city search.",
+    tagline: "Live weather forecasts powered by Open-Meteo — best-match regional model, city autocomplete and a 7-day outlook.",
     tags: ["Open-Meteo", "autocomplete", "7-day"],
-    cat: "tools", icon: "🌤"
+    cat: "tools", icon: "🌤",
+    customCard: "skycast", favorite: true
+  },
+  "news-reader": {
+    name: "EuroPress",
+    tagline: "A clean European press reader — top headlines from trusted outlets, sorted by country and topic and refreshed live.",
+    tags: ["headlines", "Europe", "live feed"],
+    cat: "tools", icon: "📰",
+    customCard: "europress", favorite: true
   },
   "flow-split-budget-allocator": {
     name: "FlowSplit",
@@ -931,7 +1097,7 @@ const APP_CONFIG = {
     tagline: "Real-time candlestick charts, Monte Carlo forecasts, regime detection and quant risk analytics for top 20 coins.",
     tags: ["CoinGecko", "Monte Carlo", "candlesticks"],
     cat: "finance", icon: "₿",
-    customCard: "cryptoscope"
+    customCard: "cryptoscope", favorite: true
   }
 };
 
@@ -1146,6 +1312,8 @@ function buildCard(app, i) {
   if (app.customCard === 'zibaldone') badge = `<span class="zib-live-badge">◈ Live</span>`;
   if (app.customCard === 'annum')     badge = `<span class="annum-live-badge">✦ Live</span>`;
   if (app.customCard === 'cryptoscope') badge = `<span class="cryptoscope-badge">▲ Live</span>`;
+  if (app.customCard === 'skycast')   badge = `<span class="skycast-badge">☀ Live</span>`;
+  if (app.customCard === 'europress') badge = `<span class="europress-badge">▦ Live</span>`;
 
   let decoration = '';
   if (app.customCard === 'zibaldone') decoration = `<div class="card-bg-grid"></div>`;
@@ -1166,6 +1334,13 @@ function buildCard(app, i) {
           <div class="body" style="height:${c.bh}px;background:currentColor"></div>
           <div class="wick" style="height:${c.wb}px"></div>
         </div>`).join('')}
+    </div>`;
+  else if (app.customCard === 'skycast') decoration = `
+    <div class="card-sky"><div class="sun"></div><div class="cloud"></div></div>`;
+  else if (app.customCard === 'europress') decoration = `
+    <div class="card-news">
+      <div class="col"><span></span><span></span><span></span><span></span></div>
+      <div class="col"><span></span><span></span><span></span><span></span></div>
     </div>`;
   else decoration = `<div class="card-motif">${CATEGORY_MOTIFS[app.cat] || CATEGORY_MOTIFS.tools}</div>`;
 
