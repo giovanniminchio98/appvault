@@ -898,6 +898,12 @@ const APP_CONFIG = {
     tags: ["AZ-900", "Azure", "quiz"],
     cat: "education", icon: "☁️"
   },
+  "fit-log": {
+    name: "FitLog",
+    tagline: "Training habit tracker — log workouts, build streaks and keep your fitness routine consistent over time.",
+    tags: ["habit tracker", "workouts", "streaks"],
+    cat: "health", icon: "💪"
+  },
   // Repos to always hide (non-app repos)
   "giovanniminchio98.github.io": { hidden: true },
   "appvault": { hidden: true },
@@ -926,8 +932,15 @@ const APP_CONFIG = {
 
 // Default for unconfigured repos → Tools category
 function defaultConfig(repoName) {
+  let name = (repoName || "")
+    .replace(/\.github\.io$/i, "")
+    .replace(/[-_.]/g, " ")
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/\b\w/g, c => c.toUpperCase());
+  if (!name) name = "Untitled App";
   return {
-    name: repoName.replace(/[-_.]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()).replace(/ Github Io$/i,''),
+    name,
     tagline: "A standalone web tool — click to open.",
     tags: ["web app"],
     cat: "tools", icon: "🛠"
@@ -1033,23 +1046,26 @@ async function fetchApps() {
       return r.has_pages;
     });
 
-    // Enrich every repo in parallel from its own published page
-    allApps = await Promise.all(pageRepos.map(async r => {
+    // Enrich every repo in parallel from its own published page.
+    // allSettled ensures one failed fetch never kills the whole list.
+    const settled = await Promise.allSettled(pageRepos.map(async r => {
       const url = r.homepage && r.homepage.startsWith("http")
         ? r.homepage
         : `https://${GITHUB_USER}.github.io/${r.name}/`;
 
       const override = APP_CONFIG[r.name];   // optional manual override
-      const meta = await fetchMeta(url);      // auto-pulled from the app
+      let meta = null;
+      try { meta = await fetchMeta(url); } catch (e) { meta = null; }
 
       // Resolve each field: manual override > fetched meta > sensible default
       const fallback = defaultConfig(r.name);
       const name    = override?.name    || meta?.name    || fallback.name;
       const tagline = override?.tagline || meta?.tagline || (r.description || fallback.tagline);
       const searchText = `${name} ${tagline} ${r.description || ""} ${r.name} ${(r.topics||[]).join(" ")}`;
-      const cat     = override?.cat     || inferCategory(searchText);
+      const cat     = override?.cat     || inferCategory(searchText) || "tools";
       const icon    = override?.icon    || CATEGORY_ICONS[cat] || "🛠";
-      const tags    = override?.tags    || (r.topics?.slice(0,3)) || fallback.tags;
+      let tags      = override?.tags    || (r.topics && r.topics.length ? r.topics.slice(0,3) : null) || fallback.tags;
+      if (!Array.isArray(tags) || !tags.length) tags = ["web app"];
 
       const colors = themeColors(cat);
       return {
@@ -1060,6 +1076,10 @@ async function fetchApps() {
         url, repoName: r.name, pushedAt: r.pushed_at
       };
     }));
+
+    allApps = settled
+      .filter(s => s.status === "fulfilled")
+      .map(s => s.value);
 
     // Always alphabetical by name (case-insensitive) — editing a repo
     // no longer reshuffles it to the top.
