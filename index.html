@@ -811,6 +811,70 @@
     white-space: nowrap;
   }
 
+  /* ── CUSTOM CARD: WORLD ALERTS (deep-blue incident map — TOOLS off-white) ──
+     Accent stays the Tools off-white; the blue map glow + radar pulse and the
+     red alert blip are decoration (semantic), matching the live app's theme. */
+  .app-card.card-worldalerts {
+    background: radial-gradient(ellipse 90% 70% at 85% 10%, rgba(22,50,79,0.55) 0%, transparent 60%), linear-gradient(160deg, #0d1724 0%, #0b1118 60%);
+    border-color: #1e3550;
+    --accent-color: #f0ede8;
+    --icon-bg: rgba(240,237,232,0.07);
+    --icon-border: rgba(120,170,220,0.30);
+  }
+  .app-card.card-worldalerts::before { background: linear-gradient(90deg, #f0ede8, #f2889b); }
+  .app-card.card-worldalerts:hover {
+    border-color: #6ea8dc;
+    box-shadow: 0 12px 40px rgba(40,90,150,0.22);
+  }
+  .app-card.card-worldalerts .app-name { color: #eaf1f8; }
+  .app-card.card-worldalerts .card-category { color: #f0ede8; }
+  .app-card.card-worldalerts .app-tagline { color: #7488a0; }
+  .app-card.card-worldalerts .tag {
+    border-color: rgba(120,170,220,0.22);
+    color: #c6d6e6;
+    background: rgba(110,168,220,0.06);
+  }
+  .app-card.card-worldalerts .card-footer { border-color: #1e3550; }
+  .app-card.card-worldalerts:hover .launch-arrow { color: #6ea8dc; }
+  /* radar pulse + red alert blip decoration */
+  .card-radar {
+    position: absolute;
+    bottom: 8px; right: 12px;
+    width: 64px; height: 64px;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+  .card-radar .ring {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    border: 1px solid rgba(180,210,240,0.35);
+    border-radius: 50%;
+  }
+  .card-radar .ring.r1 { width: 20px; height: 20px; }
+  .card-radar .ring.r2 { width: 40px; height: 40px; opacity: 0.6; }
+  .card-radar .ring.r3 { width: 60px; height: 60px; opacity: 0.35; }
+  .card-radar .blip {
+    position: absolute;
+    top: 16px; right: 14px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #f2889b;
+    box-shadow: 0 0 10px #f2889b;
+    animation: pulse 1.8s infinite;
+  }
+  .worldalerts-badge {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 99px;
+    border: 1px solid rgba(242,136,155,0.4);
+    color: #f2a5b3;
+    background: rgba(242,136,155,0.08);
+    white-space: nowrap;
+  }
+
   /* ── SKELETON ── */
   .skeleton { pointer-events: none; cursor: default; }
   .skeleton-icon {
@@ -1103,6 +1167,13 @@ const APP_CONFIG = {
     tags: ["CoinGecko", "Monte Carlo", "candlesticks"],
     cat: "finance", icon: "₿",
     customCard: "cryptoscope"
+  },
+  "world-alerts": {
+    name: "World Alerts",
+    tagline: "Live world incident map — recent earthquakes, major-disaster alerts, satellite thermal detections and US weather warnings from open public sources, with transparent timestamps.",
+    tags: ["earthquakes", "disasters", "live map"],
+    cat: "tools", icon: "🌍",
+    customCard: "worldalerts", favorite: true
   }
 };
 
@@ -1319,6 +1390,7 @@ function buildCard(app, i) {
   if (app.customCard === 'cryptoscope') badge = `<span class="cryptoscope-badge">▲ Live</span>`;
   if (app.customCard === 'skycast')   badge = `<span class="skycast-badge">☀ Live</span>`;
   if (app.customCard === 'europress') badge = `<span class="europress-badge">▦ Live</span>`;
+  if (app.customCard === 'worldalerts') badge = `<span class="worldalerts-badge">◉ Live</span>`;
 
   let decoration = '';
   if (app.customCard === 'zibaldone') decoration = `<div class="card-bg-grid"></div>`;
@@ -1346,6 +1418,11 @@ function buildCard(app, i) {
     <div class="card-news">
       <div class="col"><span></span><span></span><span></span><span></span></div>
       <div class="col"><span></span><span></span><span></span><span></span></div>
+    </div>`;
+  else if (app.customCard === 'worldalerts') decoration = `
+    <div class="card-radar">
+      <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+      <div class="blip"></div>
     </div>`;
   else decoration = `<div class="card-motif">${CATEGORY_MOTIFS[app.cat] || CATEGORY_MOTIFS.tools}</div>`;
 
